@@ -53,6 +53,25 @@ func CreateView(baseURL string, user m.AuthUser, view m.View, verbose bool) {
 		log.Fatal("viewKey and viewName are required parameters for creating a new view")
 	}
 
+	if ! ViewExists(baseURL, user, view.Key, verbose){
+
+		status := createView(baseURL, user, view, verbose)
+
+		switch status {
+		case "200 OK":
+			log.Printf("View '%s' is created", view.Name)
+		case "403 Forbidden":
+			log.Printf("User '%s' is not Authorized to create a view", user.Username)
+		default:
+			panic(fmt.Sprintf("ERROR: call status=%v\n", status))
+		}
+	}else{
+		log.Printf("A view with key %s already exists", view.Key)
+	}
+}
+
+func createView(baseURL string, user m.AuthUser, view m.View, verbose bool) string {
+
 	url := fmt.Sprintf("%s/api/views/create", baseURL)
 
 	req := u.CreateBaseRequest("POST", url, nil, user, verbose)
@@ -67,13 +86,44 @@ func CreateView(baseURL string, user m.AuthUser, view m.View, verbose bool) {
 
 	_, status := u.HTTPRequest(req, verbose)
 
-	if status == "200 OK" {
-		log.Printf("View '%s' is created", view.Name)
-	} else if status == "400 BAD REQUEST" {
-		log.Printf("Could not create View, key already exists: %s", view.Key)
-	} else if status == "403 Forbidden" {
-		log.Printf("User '%s' is not Authorized to create a view", user.Username)
+	return status
+}
+
+func DeleteView(baseURL string, user m.AuthUser, view m.View, verbose bool) {
+	if view.Key == "" {
+		log.Fatal("viewKey is a required parameter for creating a new view")
 	}
+
+	if ViewExists(baseURL, user, view.Key, verbose){
+
+		status := deleteView(baseURL, user, view, verbose)
+
+		switch status {
+		case "204 No Content":
+			log.Printf("View with key '%s' is deleted", view.Key)
+		case "403 Forbidden":
+			log.Printf("User '%s' is not Authorized to delete a view", user.Username)
+		default:
+			panic(fmt.Sprintf("ERROR: call status=%v\n", status))
+		}
+	}else{
+		log.Printf("A view with key %s does not exists", view.Key)
+	}
+}
+
+func deleteView(baseURL string, user m.AuthUser, view m.View, verbose bool) string {
+
+	url := fmt.Sprintf("%s/api/views/delete", baseURL)
+
+	req := u.CreateBaseRequest("POST", url, nil, user, verbose)
+
+	query := req.URL.Query()
+	query.Add("key", view.Key)
+	req.URL.RawQuery = query.Encode()
+
+	_, status := u.HTTPRequest(req, verbose)
+
+	return  status
 }
 
 func AddLocalSubview(baseURL string, user m.AuthUser, view m.View, verbose bool) {
@@ -101,26 +151,3 @@ func AddLocalSubview(baseURL string, user m.AuthUser, view m.View, verbose bool)
 	}
 }
 
-func DeleteView(baseURL string, user m.AuthUser, view m.View, verbose bool) {
-	if view.Key == "" {
-		log.Fatal("viewKey is a required parameter for creating a new view")
-	}
-
-	url := fmt.Sprintf("%s/api/views/delete", baseURL)
-
-	req := u.CreateBaseRequest("POST", url, nil, user, verbose)
-
-	query := req.URL.Query()
-	query.Add("key", view.Key)
-	req.URL.RawQuery = query.Encode()
-
-	_, status := u.HTTPRequest(req, verbose)
-
-	if status == "204 No Content" {
-		log.Printf("View with key '%s' is deleted", view.Key)
-	} else if status == "404 Not Found" {
-		log.Printf("View with key '%s' not found", view.Key)
-	} else if status == "401 Unauthorized" {
-		log.Printf("User '%s' is not Authorized to delete a view", user.Username)
-	}
-}
