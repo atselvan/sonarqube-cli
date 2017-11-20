@@ -6,7 +6,6 @@ import (
 	m "com/privatesquare/sonarqube-cli/model"
 	u "com/privatesquare/sonarqube-cli/utils"
 	"log"
-	"fmt"
 )
 
 func main() {
@@ -20,15 +19,18 @@ func main() {
 	listViews := flag.Bool("listViews", false, "Lists the views in sonarqube")
 	createView := flag.Bool("createView", false, "Creates a view in sonarqube. Required paramters: viewKey, viewName")
 	deleteView := flag.Bool("deleteView", false, "Deletes a view from sonarqube. Required paramter: viewKey")
-	addLocalSubview := flag.Bool("addLocalSubview", false, "Add a subview as a local reference. Required viewKey: refViewKey")
+	addLocalSubview := flag.Bool("addLocalSubview", false, "Add a subview as a local reference. Required parameter: viewKey, refViewKey")
+	grantDeveloperRole := flag.Bool("grantDeveloperRole", false, "Grant developer privileges on a project or a view. Required parameter: login, projectKey or viewKey")
+	grantIssueAdminRole := flag.Bool("grantIssueAdminRole", false, "Grant issue admin privileges on a project or a view. Required parameter: login, projectKey or viewKey")
+	grantAdminRole := flag.Bool("grantAdminRole", false, "Grant admin privileges on a project or a view. Required parameter: login, projectKey or viewKey")
 
 	//paramters
 	sonarURL := flag.String("sonarUrl", "http://localhost:9000", "SonarQube URL (Required)")
 	username := flag.String("username", "admin", "SonarQube username (Required)")
 	password := flag.String("password", "admin", "SonarQube username's password (Required)")
 
-	login := flag.String("login", "something", "Login ID of the user")
-	name := flag.String("name", "something", "Name of the user")
+	login := flag.String("login", "", "Login ID of the user")
+	name := flag.String("name", "", "Name of the user")
 	email := flag.String("email", "something@something.com", "Email ID of the user")
 
 	regex := flag.String("regex", "", "Regular expression to filter projects")
@@ -47,10 +49,9 @@ func main() {
 	sonarUser := m.SonarUser{Login: *login, Name: *name, Email: *email, Password: "defaultPass"}
 	project := m.Project{Key: *projectKey, Name: *projectName}
 	view := m.View{Key: *viewKey, Name: *viewName, Description: *viewDescription, RefKey: *refViewKey}
+	permission := m.Permission{Login: *login, ProjectKey: *projectKey, ViewKey: *viewKey}
 
 	b.ChechAuthentication(*sonarURL, user, *verbose)
-
-	fmt.Println(b.ViewExists(*sonarURL, user, *viewKey, *verbose))
 
 	if *createUser {
 		b.CreateUser(*sonarURL, user, sonarUser, *verbose)
@@ -72,10 +73,15 @@ func main() {
 		b.DeleteView(*sonarURL, user, view, *verbose)
 	} else if *addLocalSubview {
 		b.AddLocalSubview(*sonarURL, user, view, *verbose)
+	} else if *grantDeveloperRole {
+		b.GrantDeveloperRole(*sonarURL, user, permission, *verbose)
+	} else if *grantIssueAdminRole {
+		b.GrantIssueAdminRole(*sonarURL, user, permission, *verbose)
+	} else if *grantAdminRole {
+		b.GrantAdminRole(*sonarURL, user, permission, *verbose)
 	} else {
 		flag.Usage()
 		log.Fatal("Select a valid action flag")
 	}
-
 
 }
