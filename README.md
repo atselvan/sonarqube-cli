@@ -3,7 +3,7 @@
 ```sh
 Usage of ./sonarqube-cli:
   -addLocalSubview
-    	Add a subview as a local reference. Required viewKey: refViewKey
+    	Add a subview as a local reference. Required parameter: viewKey, refViewKey
   -createProject
     	Creates a project in sonarqube. Required paramters: projectKey, projectName
   -createUser
@@ -18,14 +18,20 @@ Usage of ./sonarqube-cli:
     	Deletes a view from sonarqube. Required paramter: viewKey
   -email string
     	Email ID of the user (default "something@something.com")
+  -grantAdminRole
+    	Grant admin privileges on a project or a view. Required parameter: login, projectKey or viewKey
+  -grantDeveloperRole
+    	Grant developer privileges on a project or a view. Required parameter: login, projectKey or viewKey
+  -grantIssueAdminRole
+    	Grant issue admin privileges on a project or a view. Required parameter: login, projectKey or viewKey
   -listProjects
     	Lists the projects in sonarqube. Optional paramter: regex
   -listViews
     	Lists the views in sonarqube
   -login string
-    	Login ID of the user (default "something")
+    	Login ID of the user
   -name string
-    	Name of the user (default "something")
+    	Name of the user
   -password string
     	SonarQube username's password (Required) (default "admin")
   -projectKey string
