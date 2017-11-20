@@ -2,11 +2,11 @@ package backend
 
 import (
 	m "com/privatesquare/sonarqube-cli/model"
-	"encoding/json"
-	"regexp"
-	"fmt"
 	u "com/privatesquare/sonarqube-cli/utils"
+	"encoding/json"
+	"fmt"
 	"log"
+	"regexp"
 )
 
 func ListProjects(baseURL string, user m.AuthUser, regex string, verbose bool) []m.Project {

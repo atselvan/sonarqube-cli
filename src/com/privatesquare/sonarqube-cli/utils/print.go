@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"fmt"
 	m "com/privatesquare/sonarqube-cli/model"
+	"fmt"
 	"log"
 )
 

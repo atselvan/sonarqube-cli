@@ -2,10 +2,10 @@ package backend
 
 import (
 	m "com/privatesquare/sonarqube-cli/model"
-	"fmt"
 	u "com/privatesquare/sonarqube-cli/utils"
-	"log"
 	"encoding/json"
+	"fmt"
+	"log"
 )
 
 func ChechAuthentication(baseURL string, user m.AuthUser, verbose bool) {

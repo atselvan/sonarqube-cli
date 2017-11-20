@@ -1,9 +1,8 @@
 package model
 
-
 type Permission struct {
-	Login string
+	Login      string
 	Permission string
 	ProjectKey string
-	ViewKey string
+	ViewKey    string
 }

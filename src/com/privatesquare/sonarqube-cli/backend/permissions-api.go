@@ -1,14 +1,14 @@
 package backend
 
 import (
-	"fmt"
 	m "com/privatesquare/sonarqube-cli/model"
 	u "com/privatesquare/sonarqube-cli/utils"
+	"fmt"
 	"log"
 	"os"
 )
 
-func GrantDeveloperRole(baseURL string, user m.AuthUser, permission m.Permission, verbose bool){
+func GrantDeveloperRole(baseURL string, user m.AuthUser, permission m.Permission, verbose bool) {
 	permission.Permission = "user"
 	grantProjectPermission(baseURL, user, permission, verbose)
 	permission.Permission = "codeviewer"
@@ -17,7 +17,7 @@ func GrantDeveloperRole(baseURL string, user m.AuthUser, permission m.Permission
 	grantProjectPermission(baseURL, user, permission, verbose)
 }
 
-func GrantIssueAdminRole(baseURL string, user m.AuthUser, permission m.Permission, verbose bool){
+func GrantIssueAdminRole(baseURL string, user m.AuthUser, permission m.Permission, verbose bool) {
 	permission.Permission = "user"
 	grantProjectPermission(baseURL, user, permission, verbose)
 	permission.Permission = "codeviewer"
@@ -28,7 +28,7 @@ func GrantIssueAdminRole(baseURL string, user m.AuthUser, permission m.Permissio
 	grantProjectPermission(baseURL, user, permission, verbose)
 }
 
-func GrantAdminRole(baseURL string, user m.AuthUser, permission m.Permission, verbose bool){
+func GrantAdminRole(baseURL string, user m.AuthUser, permission m.Permission, verbose bool) {
 	permission.Permission = "admin"
 	grantProjectPermission(baseURL, user, permission, verbose)
 	permission.Permission = "user"
@@ -41,7 +41,7 @@ func GrantAdminRole(baseURL string, user m.AuthUser, permission m.Permission, ve
 	grantProjectPermission(baseURL, user, permission, verbose)
 }
 
-func grantProjectPermission(baseURL string, user m.AuthUser, permission m.Permission, verbose bool){
+func grantProjectPermission(baseURL string, user m.AuthUser, permission m.Permission, verbose bool) {
 
 	if permission.ProjectKey == "" && permission.ViewKey == "" {
 		log.Fatal("Providing a projectKey or a viewKey is required for granting permissions")
@@ -58,7 +58,7 @@ func grantProjectPermission(baseURL string, user m.AuthUser, permission m.Permis
 	query.Add("permission", permission.Permission)
 	if permission.ProjectKey != "" {
 		query.Add("projectKey", permission.ProjectKey)
-	}else {
+	} else {
 		query.Add("projectKey", permission.ViewKey)
 	}
 	req.URL.RawQuery = query.Encode()
@@ -69,13 +69,13 @@ func grantProjectPermission(baseURL string, user m.AuthUser, permission m.Permis
 	case "204 No Content":
 		if permission.ProjectKey != "" {
 			log.Printf("Permission '%s' is granted to user '%s' on project with key '%s'", permission.Permission, permission.Login, permission.ProjectKey)
-		}else {
+		} else {
 			log.Printf("Permission '%s' is granted to user '%s' on view with key '%s'", permission.Permission, permission.Login, permission.ViewKey)
 		}
 	case "404 Not Found":
 		if permission.ProjectKey != "" {
 			log.Printf("Project with key '%s' does not exist", permission.ProjectKey)
-		}else {
+		} else {
 			log.Printf("View with key '%s' does not exist", permission.ViewKey)
 			os.Exit(1)
 		}

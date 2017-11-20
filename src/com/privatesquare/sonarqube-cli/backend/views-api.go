@@ -2,10 +2,10 @@ package backend
 
 import (
 	m "com/privatesquare/sonarqube-cli/model"
-	"fmt"
 	u "com/privatesquare/sonarqube-cli/utils"
-	"log"
 	"encoding/json"
+	"fmt"
+	"log"
 )
 
 func ListViews(baseURL string, user m.AuthUser, verbose bool) []m.View {
@@ -41,7 +41,7 @@ func ViewExists(baseURL string, user m.AuthUser, viewKey string, verbose bool) b
 		if view.Key == viewKey {
 			viewExists = true
 			break
-		}else{
+		} else {
 			viewExists = false
 		}
 	}
@@ -53,7 +53,7 @@ func CreateView(baseURL string, user m.AuthUser, view m.View, verbose bool) {
 		log.Fatal("viewKey and viewName are required parameters for creating a new view")
 	}
 
-	if ! ViewExists(baseURL, user, view.Key, verbose){
+	if !ViewExists(baseURL, user, view.Key, verbose) {
 
 		status := createView(baseURL, user, view, verbose)
 
@@ -65,7 +65,7 @@ func CreateView(baseURL string, user m.AuthUser, view m.View, verbose bool) {
 		default:
 			panic(fmt.Sprintf("ERROR: call status=%v\n", status))
 		}
-	}else{
+	} else {
 		log.Printf("A view with key %s already exists", view.Key)
 	}
 }
@@ -94,7 +94,7 @@ func DeleteView(baseURL string, user m.AuthUser, view m.View, verbose bool) {
 		log.Fatal("viewKey is a required parameter for creating a new view")
 	}
 
-	if ViewExists(baseURL, user, view.Key, verbose){
+	if ViewExists(baseURL, user, view.Key, verbose) {
 
 		status := deleteView(baseURL, user, view, verbose)
 
@@ -106,7 +106,7 @@ func DeleteView(baseURL string, user m.AuthUser, view m.View, verbose bool) {
 		default:
 			panic(fmt.Sprintf("ERROR: call status=%v\n", status))
 		}
-	}else{
+	} else {
 		log.Printf("A view with key %s does not exists", view.Key)
 	}
 }
@@ -123,7 +123,7 @@ func deleteView(baseURL string, user m.AuthUser, view m.View, verbose bool) stri
 
 	_, status := u.HTTPRequest(req, verbose)
 
-	return  status
+	return status
 }
 
 func AddLocalSubview(baseURL string, user m.AuthUser, view m.View, verbose bool) {
@@ -150,4 +150,3 @@ func AddLocalSubview(baseURL string, user m.AuthUser, view m.View, verbose bool)
 		log.Printf("User '%s' is not Authorized to perform this operation", user.Username)
 	}
 }
-

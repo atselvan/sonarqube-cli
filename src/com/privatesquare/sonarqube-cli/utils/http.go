@@ -1,11 +1,11 @@
 package utils
 
 import (
-	"net/http"
 	"bytes"
-	"io/ioutil"
-	"fmt"
 	m "com/privatesquare/sonarqube-cli/model"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
 /*
@@ -36,7 +36,7 @@ func HTTPRequest(req *http.Request, verbose bool) ([]byte, string) {
 	return respBody, resp.Status
 }
 
-func CreateBaseRequest (method, url string, body []byte, user m.AuthUser, verbose bool) *http.Request {
+func CreateBaseRequest(method, url string, body []byte, user m.AuthUser, verbose bool) *http.Request {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	req.SetBasicAuth(user.Username, user.Password)
 	req.Header.Set("Content-Type", "application/json")
@@ -50,6 +50,3 @@ func CreateBaseRequest (method, url string, body []byte, user m.AuthUser, verbos
 
 	return req
 }
-
-
-

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"flag"
 	b "com/privatesquare/sonarqube-cli/backend"
 	m "com/privatesquare/sonarqube-cli/model"
 	u "com/privatesquare/sonarqube-cli/utils"
+	"flag"
 	"log"
 )
 

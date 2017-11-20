@@ -3,7 +3,7 @@ package model
 type AuthUser struct {
 	Username string
 	Password string
-	Valid bool `json:"valid"`
+	Valid    bool `json:"valid"`
 }
 
 type SonarUser struct {
