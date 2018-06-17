@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 )
 
 func ListViews(baseURL string, user m.AuthUser, verbose bool) []m.View {
@@ -146,6 +147,67 @@ func AddLocalSubview(baseURL string, user m.AuthUser, view m.View, verbose bool)
 		log.Printf("View with key '%s' is added as a local reference to view with key '%s'", view.RefKey, view.Key)
 	} else if status == "400 Bad Request" {
 		log.Printf("View with key '%s' is already referenced to view with key '%s'", view.RefKey, view.Key)
+	} else if status == "403 Forbidden" {
+		log.Printf("User '%s' is not Authorized to perform this operation", user.Username)
+	}
+}
+
+func addComponentToView(baseURL string, user m.AuthUser, viewKey, projectKey string, verbose bool) {
+	if viewKey == "" || projectKey == "" {
+		log.Fatal("viewKey and projectKey are required parameters for adding a project/component to a view")
+	}
+	if !ViewExists(baseURL, user, viewKey, verbose) {
+		log.Printf("View with key '%s' does not exist", viewKey)
+		os.Exit(1)
+	}
+	if !ProjectExists(baseURL, user, projectKey, verbose) {
+		log.Printf("Project with key '%s' does not exist", projectKey)
+		os.Exit(1)
+	}
+	url := fmt.Sprintf("%s/api/views/add_project", baseURL)
+	req := u.CreateBaseRequest("POST", url, nil, user, verbose)
+
+	query := req.URL.Query()
+	query.Add("key", viewKey)
+	query.Add("project_key", projectKey)
+	req.URL.RawQuery = query.Encode()
+
+	_, status := u.HTTPRequest(req, verbose)
+
+	if status == "204 No Content" {
+		log.Printf("Project with key '%s' is added to view with key '%s'", projectKey, viewKey)
+	} else if status == "400 Bad Request" {
+		log.Printf("Project with key '%s' is already selected in a view with key '%s'", projectKey, viewKey)
+	} else if status == "403 Forbidden" {
+		log.Printf("User '%s' is not Authorized to perform this operation", user.Username)
+	}
+}
+
+func removeComponentFromView(baseURL string, user m.AuthUser, viewKey, projectKey string, verbose bool) {
+	if viewKey == "" || projectKey == "" {
+		log.Fatal("viewKey and projectKey are required parameters for adding a project/component to a view")
+	}
+	if !ViewExists(baseURL, user, viewKey, verbose) {
+		log.Printf("View with key '%s' does not exist", viewKey)
+		os.Exit(1)
+	}
+	if !ProjectExists(baseURL, user, projectKey, verbose) {
+		log.Printf("Project with key '%s' does not exist", projectKey)
+		os.Exit(1)
+	}
+
+	url := fmt.Sprintf("%s/api/views/remove_project", baseURL)
+	req := u.CreateBaseRequest("POST", url, nil, user, verbose)
+
+	query := req.URL.Query()
+	query.Add("key", viewKey)
+	query.Add("project_key", projectKey)
+	req.URL.RawQuery = query.Encode()
+
+	_, status := u.HTTPRequest(req, verbose)
+
+	if status == "204 No Content" {
+		log.Printf("Project with key '%s' has been removed from view with key '%s'", projectKey, viewKey)
 	} else if status == "403 Forbidden" {
 		log.Printf("User '%s' is not Authorized to perform this operation", user.Username)
 	}

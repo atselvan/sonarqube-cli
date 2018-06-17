@@ -46,9 +46,18 @@ func ListProjects(baseURL string, user m.AuthUser, regex string, verbose bool) [
 	return projectsArray
 }
 
-// TODO
-func ProjectExists() {
-
+func ProjectExists(baseURL string, user m.AuthUser, projectKey string, verbose bool) bool {
+	var projectExists bool
+	projects := ListProjects(baseURL, user, "", verbose)
+	for _, project := range projects {
+		if project.Key == projectKey {
+			projectExists = true
+			break
+		} else {
+			projectExists = false
+		}
+	}
+	return projectExists
 }
 
 func CreateProject(baseURL string, user m.AuthUser, project m.Project, verbose bool) {
