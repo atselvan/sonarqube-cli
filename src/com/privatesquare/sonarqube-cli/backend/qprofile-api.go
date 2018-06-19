@@ -90,7 +90,7 @@ func RestoreQualityProfile (baseURL string, user m.AuthUser, profile m.QualityPr
 	if status == "200 OK" {
 		log.Printf("Profile '%s' is restored", profile.Name)
 	} else if status == "400 Bad Request" {
-		log.Printf("There was a problem while restoring the profile. Set verbose for more information", profile.Name)
+		log.Printf("There was a problem while restoring the profile %s. Set verbose for more information", profile.Name)
 	} else if status == "401 Unauthorized" {
 		log.Printf("User '%s' is not Authorized to manage quality profiles", user.Username)
 	}
