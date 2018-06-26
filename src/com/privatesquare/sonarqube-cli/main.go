@@ -6,13 +6,16 @@ import (
 	u "com/privatesquare/sonarqube-cli/utils"
 	"flag"
 	"log"
+	"fmt"
 )
 
 func main() {
 
 	//options
-	createUser := flag.Bool("createUser", false, "Create a user. Required paramters: login, name, email")
-	deactivateUser := flag.Bool("deactivateUser", false, "Deactivate a user. Required paramters: login")
+	getUsersList := flag.Bool("getUsersList", false, "Get a list of users registers in sonarqube")
+	printUserDetails := flag.Bool("printUserDetails", false, "Print the details of a user. Required parameter: userId")
+	createUser := flag.Bool("createUser", false, "Create a user in sonarqube. Required paramters: userId, name, email, userPassword")
+	deactivateUser := flag.Bool("deactivateUser", false, "Deactivate a user in sonarqube. Required paramters: userId")
 	listProjects := flag.Bool("listProjects", false, "Lists the projects in sonarqube. Optional paramter: regex")
 	createProject := flag.Bool("createProject", false, "Creates a project in sonarqube. Required paramters: projectKey, projectName")
 	deleteProject := flag.Bool("deleteProject", false, "Deletes a project from sonarqube. Required paramter: projectKey")
@@ -29,9 +32,10 @@ func main() {
 	username := flag.String("username", "admin", "SonarQube username (Required)")
 	password := flag.String("password", "admin", "SonarQube username's password (Required)")
 
-	login := flag.String("login", "", "Login ID of the user")
+	userId := flag.String("userId", "", "Login ID of the user")
 	name := flag.String("name", "", "Name of the user")
-	email := flag.String("email", "something@something.com", "Email ID of the user")
+	email := flag.String("email", "", "Email ID of the user")
+	userPassword := flag.String("userPassword", "", "User Password")
 
 	regex := flag.String("regex", "", "Regular expression to filter projects")
 	projectKey := flag.String("projectKey", "", "Project Key")
@@ -46,17 +50,23 @@ func main() {
 	flag.Parse()
 
 	user := m.AuthUser{Username: *username, Password: *password}
-	sonarUser := m.SonarUser{Login: *login, Name: *name, Email: *email, Password: "defaultPass"}
+	userDetails := m.UserDetails{Login: *userId, Name: *name, Email: *email}
 	project := m.Project{Key: *projectKey, Name: *projectName}
 	view := m.View{Key: *viewKey, Name: *viewName, Description: *viewDescription, RefKey: *refViewKey}
-	permission := m.Permission{Login: *login, ProjectKey: *projectKey, ViewKey: *viewKey}
+	permission := m.Permission{Login: *userId, ProjectKey: *projectKey, ViewKey: *viewKey}
 
-	b.ChechAuthentication(*sonarURL, user, *verbose)
+	b.CheckAuthentication(*sonarURL, user, *verbose)
 
-	if *createUser {
-		b.CreateUser(*sonarURL, user, sonarUser, *verbose)
+	if *getUsersList {
+		usersList := b.GetUsersList(*sonarURL, user, *verbose)
+		u.PrintStringArray(usersList)
+		fmt.Printf("No. of users in sonarqube : %d\n", len(usersList))
+	}else if *printUserDetails {
+		b.PrintUserDetails(*sonarURL, *userId, user, *verbose)
+	}else if *createUser {
+		b.CreateUser(*sonarURL, *userPassword, user, userDetails, *verbose)
 	} else if *deactivateUser {
-		b.DeactivateUser(*sonarURL, user, sonarUser, *verbose)
+		b.DeactivateUser(*sonarURL, *userId, user, *verbose)
 	} else if *listProjects {
 		projects := b.ListProjects(*sonarURL, user, *regex, *verbose)
 		u.PrintProjectsArray(projects, *regex)

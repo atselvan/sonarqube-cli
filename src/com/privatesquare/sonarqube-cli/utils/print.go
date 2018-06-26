@@ -7,9 +7,9 @@ import (
 )
 
 // PrintStringArray prints a string Array
-func PrintStringArray(stringArray []string) {
-	for _, array := range stringArray {
-		fmt.Println(array)
+func PrintStringArray(array []string) {
+	for _, element := range array {
+		fmt.Println(element)
 	}
 
 }
