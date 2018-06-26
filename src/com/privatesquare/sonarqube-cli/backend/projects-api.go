@@ -52,7 +52,6 @@ func ListProjects(baseURL string, user m.AuthUser, regex string, verbose bool) [
 func ProjectExists(baseURL string, user m.AuthUser, projectKey string, verbose bool) bool {
 	var projectExists bool
 	projects := ListProjects(baseURL, user, "", verbose)
-	fmt.Println(projects)
 	for _, project := range projects {
 		if project.Key == projectKey {
 			projectExists = true
