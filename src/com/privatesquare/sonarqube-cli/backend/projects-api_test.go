@@ -12,11 +12,12 @@ const (
 	password = "admin"
 	verbose  = false
 )
-var(
-	authUser = model.AuthUser{Username: username, Password: password}
+
+var (
+	authUser    = model.AuthUser{Username: username, Password: password}
 	projectName = "test"
-	projectKey = "com.test.test:test"
-	project = model.Project{Name: projectName, Key: projectKey}
+	projectKey  = "com.test.test:test"
+	project     = model.Project{Name: projectName, Key: projectKey}
 )
 
 func TestProjectDoesNotExists(t *testing.T) {

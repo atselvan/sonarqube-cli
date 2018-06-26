@@ -5,8 +5,8 @@ import (
 	m "com/privatesquare/sonarqube-cli/model"
 	u "com/privatesquare/sonarqube-cli/utils"
 	"flag"
-	"log"
 	"fmt"
+	"log"
 )
 
 func main() {
@@ -61,9 +61,9 @@ func main() {
 		usersList := b.GetUsersList(*sonarURL, user, *verbose)
 		u.PrintStringArray(usersList)
 		fmt.Printf("No. of users in sonarqube : %d\n", len(usersList))
-	}else if *printUserDetails {
+	} else if *printUserDetails {
 		b.PrintUserDetails(*sonarURL, *userId, user, *verbose)
-	}else if *createUser {
+	} else if *createUser {
 		b.CreateUser(*sonarURL, *userPassword, user, userDetails, *verbose)
 	} else if *deactivateUser {
 		b.DeactivateUser(*sonarURL, *userId, user, *verbose)

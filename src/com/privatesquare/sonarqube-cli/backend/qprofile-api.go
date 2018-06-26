@@ -1,19 +1,19 @@
 package backend
 
 import (
+	"bytes"
 	m "com/privatesquare/sonarqube-cli/model"
 	u "com/privatesquare/sonarqube-cli/utils"
 	"fmt"
-	"log"
-	"io/ioutil"
-	"os"
 	"io"
+	"io/ioutil"
+	"log"
 	"mime/multipart"
-	"bytes"
 	"net/http"
+	"os"
 )
 
-func BackupQualityProfile (baseURL string, user m.AuthUser, profile m.QualityProfile, verbose bool) {
+func BackupQualityProfile(baseURL string, user m.AuthUser, profile m.QualityProfile, verbose bool) {
 	if profile.Name == "" || profile.Language == "" {
 		log.Fatal("profileName and profileLang are required parameters for managing quality profiles")
 	}
@@ -53,7 +53,7 @@ func BackupQualityProfile (baseURL string, user m.AuthUser, profile m.QualityPro
 	}
 }
 
-func RestoreQualityProfile (baseURL string, user m.AuthUser, profile m.QualityProfile, verbose bool) {
+func RestoreQualityProfile(baseURL string, user m.AuthUser, profile m.QualityProfile, verbose bool) {
 	if profile.Name == "" || profile.Language == "" {
 		log.Fatal("profileName and profileLang are required parameters for managing quality profiles")
 	}

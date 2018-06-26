@@ -7,11 +7,11 @@ type AuthUser struct {
 }
 
 type UsersAPIResp struct {
-	Paging Paging `json:"paging"`
-	Users []UserDetails `json:"users"`
+	Paging Paging        `json:"paging"`
+	Users  []UserDetails `json:"users"`
 }
 
-type UserDetails struct{
+type UserDetails struct {
 	Login            string   `json:"login"`
 	Name             string   `json:"name"`
 	Active           bool     `json:"active"`

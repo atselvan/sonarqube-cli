@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strings"
-	"os"
 )
 
 func ListProjects(baseURL string, user m.AuthUser, regex string, verbose bool) []m.Project {

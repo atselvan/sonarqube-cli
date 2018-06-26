@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strings"
 	"os"
+	"strings"
 )
 
 func CheckAuthentication(baseURL string, user m.AuthUser, verbose bool) {
@@ -28,14 +28,14 @@ func CheckAuthentication(baseURL string, user m.AuthUser, verbose bool) {
 	}
 }
 
-func getUsers(baseURL string, user m.AuthUser, verbose bool) []m.UserDetails{
+func getUsers(baseURL string, user m.AuthUser, verbose bool) []m.UserDetails {
 	url := fmt.Sprintf("%s/api/users/search", baseURL)
 	var (
 		usersApiResp m.UsersAPIResp
-		users []m.UserDetails
-		isLast = false
+		users        []m.UserDetails
+		isLast       = false
 	)
-	paging := m.Paging{PageIndex:1, PageSize:100}
+	paging := m.Paging{PageIndex: 1, PageSize: 100}
 	for isLast == false {
 		req := u.CreateBaseRequest("GET", url, nil, user, verbose)
 		query := req.URL.Query()
@@ -44,26 +44,26 @@ func getUsers(baseURL string, user m.AuthUser, verbose bool) []m.UserDetails{
 		req.URL.RawQuery = query.Encode()
 		respBody, _ := u.HTTPRequest(req, verbose)
 		json.Unmarshal(respBody, &usersApiResp)
-		for _, user := range usersApiResp.Users{
+		for _, user := range usersApiResp.Users {
 			users = append(users, user)
 		}
-		if usersApiResp.Paging.Total - usersApiResp.Paging.PageIndex * usersApiResp.Paging.PageSize >0 {
-			paging.PageIndex ++
+		if usersApiResp.Paging.Total-usersApiResp.Paging.PageIndex*usersApiResp.Paging.PageSize > 0 {
+			paging.PageIndex++
 		} else {
-			isLast =true
+			isLast = true
 		}
 	}
 	return users
 }
 
-func userExists(baseURL, userId string, user m.AuthUser, verbose bool) bool{
+func userExists(baseURL, userId string, user m.AuthUser, verbose bool) bool {
 	if userId == "" {
 		log.Fatal("userId is a required parameter for checking if a user exists")
 	}
 	var isExist bool
 	users := getUsers(baseURL, user, verbose)
-	for _, user := range users{
-		if userId == user.Login{
+	for _, user := range users {
+		if userId == user.Login {
 			isExist = true
 			break
 		} else {
@@ -73,27 +73,27 @@ func userExists(baseURL, userId string, user m.AuthUser, verbose bool) bool{
 	return isExist
 }
 
-func getUserDetails(baseURL, userId string, user m.AuthUser, verbose bool) m.UserDetails{
+func getUserDetails(baseURL, userId string, user m.AuthUser, verbose bool) m.UserDetails {
 	if userId == "" {
 		log.Fatal("userId is a required parameter for getting user details")
 	}
 	users := getUsers(baseURL, user, verbose)
 	var userDetails m.UserDetails
-	if userExists(baseURL, userId, user, verbose){
-		for _, user := range users{
-			if userId == user.Login{
+	if userExists(baseURL, userId, user, verbose) {
+		for _, user := range users {
+			if userId == user.Login {
 				userDetails = user
 				break
 			}
 		}
-	}else {
+	} else {
 		log.Printf("User %s does not exist\n", userId)
 		os.Exit(1)
 	}
 	return userDetails
 }
 
-func GetUsersList(baseURL string, user m.AuthUser, verbose bool) []string{
+func GetUsersList(baseURL string, user m.AuthUser, verbose bool) []string {
 	var usersList []string
 	users := getUsers(baseURL, user, verbose)
 	for _, user := range users {
@@ -102,7 +102,7 @@ func GetUsersList(baseURL string, user m.AuthUser, verbose bool) []string{
 	return usersList
 }
 
-func PrintUserDetails(baseURL, userId string, user m.AuthUser, verbose bool){
+func PrintUserDetails(baseURL, userId string, user m.AuthUser, verbose bool) {
 	if userId == "" {
 		log.Fatal("userId is a required parameter for printing user details")
 	}
@@ -122,7 +122,7 @@ func CreateUser(baseURL, userPassword string, user m.AuthUser, userDetails m.Use
 		log.Fatal("userId, name, email and userPassword are required parameters for creating a user")
 	}
 	url := fmt.Sprintf("%s/api/users/create", baseURL)
-	if !userExists(baseURL, userDetails.Login, user, verbose){
+	if !userExists(baseURL, userDetails.Login, user, verbose) {
 		req := u.CreateBaseRequest("POST", url, nil, user, verbose)
 		query := req.URL.Query()
 		query.Add("login", strings.ToUpper(userDetails.Login))
@@ -142,7 +142,7 @@ func CreateUser(baseURL, userPassword string, user m.AuthUser, userDetails m.Use
 		} else if status == "401" {
 			log.Printf("User '%s' is not authorized to create a new user", user.Username)
 		}
-	}else {
+	} else {
 		log.Printf("User %s already exists\n", userDetails.Login)
 		os.Exit(1)
 	}
@@ -154,7 +154,7 @@ func DeactivateUser(baseURL, userId string, user m.AuthUser, verbose bool) {
 	}
 	url := fmt.Sprintf("%s/api/users/deactivate", baseURL)
 
-	if userExists(baseURL, userId, user, verbose){
+	if userExists(baseURL, userId, user, verbose) {
 		req := u.CreateBaseRequest("POST", url, nil, user, verbose)
 		query := req.URL.Query()
 		query.Add("login", userId)
@@ -168,7 +168,7 @@ func DeactivateUser(baseURL, userId string, user m.AuthUser, verbose bool) {
 		} else if status == "401" {
 			log.Printf("User '%s' is not authorized to delete a user", user.Username)
 		}
-	}else {
+	} else {
 		log.Printf("User %s does not exist\n", userId)
 		os.Exit(1)
 	}
