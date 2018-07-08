@@ -64,9 +64,9 @@ func main() {
 	} else if *printUserDetails {
 		b.PrintUserDetails(*sonarURL, *userId, user, *verbose)
 	} else if *createUser {
-		b.CreateUser(*sonarURL, *userPassword, user, userDetails, *verbose)
+		b.CheckAndCreateUser(*sonarURL, *userPassword, user, userDetails, *verbose)
 	} else if *deactivateUser {
-		b.DeactivateUser(*sonarURL, *userId, user, *verbose)
+		b.CheckAndDeactivateUser(*sonarURL, *userId, user, *verbose)
 	} else if *listProjects {
 		projects := b.ListProjects(*sonarURL, user, *regex, *verbose)
 		u.PrintProjectsArray(projects, *regex)

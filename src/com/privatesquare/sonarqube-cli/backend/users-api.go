@@ -35,7 +35,7 @@ func getUsers(baseURL string, user m.AuthUser, verbose bool) []m.UserDetails {
 		users        []m.UserDetails
 		isLast       = false
 	)
-	paging := m.Paging{PageIndex: 1, PageSize: 100}
+	paging := m.Paging{PageIndex: 1, PageSize: 500}
 	for isLast == false {
 		req := u.CreateBaseRequest("GET", url, nil, user, verbose)
 		query := req.URL.Query()
@@ -117,60 +117,68 @@ func PrintUserDetails(baseURL, userId string, user m.AuthUser, verbose bool) {
 	fmt.Printf("Identity Provider		: %s\n", userDetails.ExternalProvider)
 }
 
-func CreateUser(baseURL, userPassword string, user m.AuthUser, userDetails m.UserDetails, verbose bool) {
-	if userDetails.Login == "" || userDetails.Name == "" || userDetails.Email == "" || userPassword == "" {
-		log.Fatal("userId, name, email and userPassword are required parameters for creating a user")
-	}
-	url := fmt.Sprintf("%s/api/users/create", baseURL)
+func CheckAndCreateUser(baseURL, userPassword string, user m.AuthUser, userDetails m.UserDetails, verbose bool) {
 	if !userExists(baseURL, userDetails.Login, user, verbose) {
-		req := u.CreateBaseRequest("POST", url, nil, user, verbose)
-		query := req.URL.Query()
-		query.Add("login", strings.ToUpper(userDetails.Login))
-		query.Add("name", strings.Title(userDetails.Name))
-		query.Add("email", userDetails.Email)
-		query.Add("password", userPassword)
-		req.URL.RawQuery = query.Encode()
-
-		_, status := u.HTTPRequest(req, verbose)
-
-		status = strings.Trim(status, " ")
-
-		if status == "200" {
-			log.Printf("User with login='%s' is created", userDetails.Login)
-		} else if status == "400" {
-			log.Printf("There was a problem making the request. User -verbose flag for more details", userDetails.Login)
-		} else if status == "401" {
-			log.Printf("User '%s' is not authorized to create a new user", user.Username)
-		}
+		createUser(baseURL, userPassword, user, userDetails, verbose)
 	} else {
 		log.Printf("User %s already exists\n", userDetails.Login)
 		os.Exit(1)
 	}
 }
 
-func DeactivateUser(baseURL, userId string, user m.AuthUser, verbose bool) {
-	if userId == "" {
-		log.Fatal("userId is a required parameter for deactivating a user")
+func createUser(baseURL, userPassword string, user m.AuthUser, userDetails m.UserDetails, verbose bool) {
+	if userDetails.Login == "" || userDetails.Name == "" || userDetails.Email == "" || userPassword == "" {
+		log.Fatal("userId, name, email and userPassword are required parameters for creating a user")
 	}
-	url := fmt.Sprintf("%s/api/users/deactivate", baseURL)
+	url := fmt.Sprintf("%s/api/users/create", baseURL)
+	req := u.CreateBaseRequest("POST", url, nil, user, verbose)
+	query := req.URL.Query()
+	query.Add("login", strings.ToUpper(userDetails.Login))
+	query.Add("name", strings.Title(userDetails.Name))
+	query.Add("email", userDetails.Email)
+	query.Add("password", userPassword)
+	req.URL.RawQuery = query.Encode()
 
+	_, status := u.HTTPRequest(req, verbose)
+
+	status = strings.Trim(status, " ")
+
+	if status == "200" {
+		log.Printf("User with login='%s' is created", userDetails.Login)
+	} else if status == "401" {
+		log.Printf("User '%s' is not authorized to create a new user", user.Username)
+	} else {
+		log.Printf("There was a problem creating the user. Use -verbose flag for more details", userDetails.Login)
+	}
+}
+
+func CheckAndDeactivateUser(baseURL, userId string, user m.AuthUser, verbose bool) {
 	if userExists(baseURL, userId, user, verbose) {
-		req := u.CreateBaseRequest("POST", url, nil, user, verbose)
-		query := req.URL.Query()
-		query.Add("login", userId)
-		req.URL.RawQuery = query.Encode()
-		_, status := u.HTTPRequest(req, verbose)
-
-		status = strings.Trim(status, " ")
-
-		if status == "200" {
-			log.Printf("User %s is deactivated", userId)
-		} else if status == "401" {
-			log.Printf("User '%s' is not authorized to delete a user", user.Username)
-		}
+		deactivateUser(baseURL, userId, user, verbose)
 	} else {
 		log.Printf("User %s does not exist\n", userId)
 		os.Exit(1)
 	}
+}
 
+func deactivateUser(baseURL, userId string, user m.AuthUser, verbose bool) {
+	if userId == "" {
+		log.Fatal("userId is a required parameter for deactivating a user")
+	}
+	url := fmt.Sprintf("%s/api/users/deactivate", baseURL)
+	req := u.CreateBaseRequest("POST", url, nil, user, verbose)
+	query := req.URL.Query()
+	query.Add("login", userId)
+	req.URL.RawQuery = query.Encode()
+	_, status := u.HTTPRequest(req, verbose)
+
+	status = strings.Trim(status, " ")
+
+	if status == "200" {
+		log.Printf("User %s is deactivated", userId)
+	} else if status == "401" {
+		log.Printf("User '%s' is not authorized to delete a user", user.Username)
+	} else {
+		log.Printf("There was a problem deactivating the user. Use -verbose flag for more details", userId)
+	}
 }
